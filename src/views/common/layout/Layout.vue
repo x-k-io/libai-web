@@ -284,9 +284,14 @@ const handleCommand = async (command) => {
   }
 }
 
-onMounted(() => {
-  renderUserInfo()
-})
+// 监听 userInfo 变化，更新菜单和用户信息
+watch(
+  () => userStore.userInfo,
+  () => {
+    renderUserInfo()
+  },
+  { immediate: true }
+)
 
 watch(
     () => route.fullPath,
