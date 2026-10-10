@@ -28,10 +28,5 @@ export const staticRoutes = [
                 meta: { title: '个人信息' }
             }
         ]
-    },
-    // 404兜底放这里
-    {
-        path: '/:pathMatch(.*)*',
-        redirect: '/dashboard'
     }
 ]
