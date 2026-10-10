@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { resetRouter } from '@/router'
 
 export const useUserStore = defineStore('user', () => {
   // 后端 UserTokenVo 返回: accessToken / refreshToken / accessExpire
@@ -36,6 +37,8 @@ export const useUserStore = defineStore('user', () => {
     localStorage.removeItem('token')
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('accessExpire')
+    // 重置路由，清除动态添加的路由
+    resetRouter()
   }
 
   return {

@@ -71,6 +71,34 @@ const router = createRouter({
 // 标记动态路由是否已添加
 let dynamicRoutesAdded = false
 
+// 重置路由，清除所有动态添加的路由
+export function resetRouter() {
+  const newRouter = createRouter({
+    history: createWebHistory(),
+    routes: staticRoutes
+  })
+  router.matcher = newRouter.matcher
+  dynamicRoutesAdded = false
+}
+
+// 递归过滤动态路由，根据用户权限精确控制每个子路由的访问
+function filterAsyncRoutes(routes, perms) {
+  const res = []
+  routes.forEach(route => {
+    // 如果路由没有 permission 标识，或者用户有该权限，则保留
+    if (!route.meta?.permission || perms.includes(route.meta.permission)) {
+      const temp = { ...route }
+      if (temp.children) {
+        temp.children = filterAsyncRoutes(temp.children, perms)
+        // 子路由过滤完为空，不保留父菜单
+        if (temp.children.length === 0) return
+      }
+      res.push(temp)
+    }
+  })
+  return res
+}
+
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   const token = localStorage.getItem('token')
@@ -103,8 +131,10 @@ router.beforeEach(async (to, from, next) => {
   // 根据权限动态添加路由（每次导航都检查，确保登录后立即生效）
   if (token && userStore.userInfo && !dynamicRoutesAdded) {
     const permissions = userStore.userInfo.permissions || []
-    if (permissions.includes('system:manager')) {
-      dynamicRoutes.forEach(route => {
+    // 递归过滤动态路由，只注册用户有权限的路由
+    const accessRoutes = filterAsyncRoutes(dynamicRoutes, permissions)
+    if (accessRoutes.length > 0) {
+      accessRoutes.forEach(route => {
         router.addRoute('Layout', route)
       })
       dynamicRoutesAdded = true
