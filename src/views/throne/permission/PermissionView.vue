@@ -34,7 +34,7 @@
       >
         <el-table-column prop="name" label="权限名称" min-width="200" />
         <el-table-column prop="permission" label="权限标识" min-width="180"/>
-        <el-table-column prop="orders" label="排序" width="80" />
+        <el-table-column prop="sortOrder" label="排序" width="80" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="handleEdit(row)" v-permission="'system:permission:update'">
@@ -83,8 +83,8 @@
             placeholder="请选择上级权限"
           />
         </el-form-item>
-        <el-form-item label="排序" prop="orders">
-          <el-input-number v-model="formData.orders" :min="0" style="width: 100%" />
+        <el-form-item label="排序" prop="sortOrder">
+          <el-input-number v-model="formData.sortOrder" :min="0" style="width: 100%" />
         </el-form-item>
       </el-form>
       
@@ -183,7 +183,7 @@ const formData = reactive({
   name: '',
   permission: '',
   parentId: 0,
-  orders: 0
+  sortOrder: 0
 })
 
 const formRules = {
@@ -289,20 +289,20 @@ const handleSubmit = async () => {
       submitLoading.value = true
       try {
         if (isEdit.value) {
-          // UpdatePermissionRequest: { id, name, orders } (parentId、permission 不可修改)
+          // UpdatePermissionRequest: { id, name, sortOrder } (parentId、permission 不可修改)
           await updatePermission({
             id: formData.id,
             name: formData.name,
-            orders: formData.orders
+            sortOrder: formData.sortOrder
           })
           ElMessage.success('更新成功')
         } else {
-          // CreatePermissionRequest: { parentId, name, permission, orders }
+          // CreatePermissionRequest: { parentId, name, permission, sortOrder }
           await createPermission({
             parentId: formData.parentId,
             name: formData.name,
             permission: formData.permission,
-            orders: formData.orders
+            sortOrder: formData.sortOrder
           })
           ElMessage.success('创建成功')
         }
@@ -325,7 +325,7 @@ const handleDialogClose = () => {
     name: '',
     permission: '',
     parentId: 0,
-    orders: 0
+    sortOrder: 0
   })
 }
 
